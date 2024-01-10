@@ -1,0 +1,50 @@
+%% Import and display the image.
+clc;close all;clear;
+
+worms = imread('binary.png');
+worms = rgb2gray(worms);
+figure; imshow(worms);
+
+%% Detect edges with default Sobel method.
+wormsEdge = edge(worms);
+% wormsEdge = edge(worms, 'sobel', threshold_value);
+figure; imshow(wormsEdge);
+
+%% Get the default threshold value.
+[wormsEdge,thresh] = edge(worms);
+thresh
+
+%% Increase the threshold value to reduce background noise detection.
+wormsEdge = edge(worms, 0.001);
+figure; imshow(wormsEdge);
+
+%===============================================%
+%% Detect edges using the Canny operator and observe thethreshold.
+[wormsEdge,thresh] = edge(worms,'canny');
+figure; imshow(wormsEdge);
+thresh
+
+%% Increase the threshold value to ignore noise detection.
+% edge uses this value for the high value and uses threshold*0.4 for the low threshold.
+wormsEdge = edge(worms,'canny', 0.25);
+figure; imshow(wormsEdge);
+
+%===============================================%
+%% Preprocess and segment out the worms to create a binary image.
+wormsBW = createBinaryWorms(worms);
+figure, imshow(wormsBW);
+
+%% Extract edges from the binary worms’ image.
+wormsEdge = edge(wormsBW,'canny');
+figure; imshow(wormsEdge)
+
+%============================================%
+%% Extract the boundaries of all the worms
+wormsBoundary = bwboundaries(wormsBW);
+numBoundaries = length(wormsBoundary)
+
+%% Display the original image and plot the object boundaries on it
+figure, imshow(worms,[])
+hold on
+% Highlight the bounderies using a thin line.
+visboundaries(wormsBoundary,'LineWidth',1,'EnhanceVisibility',false)
